@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart To-Do List with Filters & Search</title>
+</head>
+
+<style>
+    body {
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: aliceblue;
+        margin: 25px;
+        padding: 10px;
+        color: rgb(24, 92, 155);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    }
+
+    #taskInput {
+
+        padding: 10px;
+        margin: 10px;
+
+    }
+
+    #searchInput {
+
+        padding: 10px;
+        margin: 10px;
+
+    }
+
+    button {
+
+        padding: 10px;
+        margin: 10px;
+        background-color: #185b81;
+        border: none;
+        border-radius: 5px;
+        color: white;
+
+    }
+
+    button:hover {
+
+        padding: 10px;
+        margin: 10px;
+        background-color: #9cc3da;
+        border: none;
+        border-radius: 5px;
+        color: white;
+
+    }
+
+    #taskList {
+
+        min-height: 25px;
+        min-width: 10px;
+        background-color: rgb(255, 255, 255);
+        border: 2px solid #9cc3da;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        gap: 10px;
+    }
+</style>
+
+<body>
+
+    <h1>To-Do List</h1>
+    <input type="text" id="taskInput" placeholder="Add a new task..." />
+    <button onclick="addTask()">Add</button>
+
+    <input type="text" id="searchInput" oninput="searchTasks()" placeholder="Search tasks..." />
+
+    <div id="filterButtons">
+        <button onclick="filterTasks('all')">All</button>
+        <button onclick="filterTasks('completed')">Completed</button>
+        <button onclick="filterTasks('pending')">Pending</button>
+    </div>
+
+    <div id="taskList"></div>
+    <button onclick="deleteTask()">Show deleted Task</button>
+    <h3>Deleted List</h3>
+    <div id="deletedList"></div>
+    <button onclick="Back()" id="back">Back</button>
+    <script>
+        let tasks = [];
+    let deletedTasks = [];
+
+    function addTask() {
+        let inputValue = document.getElementById("taskInput").value;
+        let output = document.getElementById("taskList");
+
+        if (inputValue === "") {
+            output.textContent = "❌ Please enter a value!";
+            return;
+        }
+
+        let taskObj = {
+            text: inputValue,
+            completed: false
+        };
+
+        tasks.push(taskObj);
+        renderTasks();
+
+        document.getElementById("taskInput").value = "";
+    }
+
+    function renderTasks(filter = "all", search = "") {
+        let output = document.getElementById("taskList");
+        output.innerHTML = "";
+
+        tasks
+            .filter(task => {
+                if (filter === "completed") return task.completed;
+                if (filter === "pending") return !task.completed;
+                return true; // 'all'
+            })
+            .filter(task => task.text.toLowerCase().includes(search.toLowerCase()))
+            .forEach((task, index) => {
+                let div = document.createElement("div");
+                div.style.display = "flex";
+                div.style.alignItems = "center";
+                div.style.gap = "10px";
+                div.style.marginBottom = "10px";
+
+                div.style.textDecoration = task.completed ? "line-through" : "none";
+                div.textContent = task.text;
+
+                let doneBtn = document.createElement("button");
+                doneBtn.textContent = "Done";
+                doneBtn.style.backgroundColor = "green";
+                doneBtn.onclick = () => toggleComplete(index);
+
+                let deleteBtn = document.createElement("button");
+                deleteBtn.textContent = "🗑️";
+                deleteBtn.style.backgroundColor = "rgb(236, 78, 78)";
+                deleteBtn.onclick = () => {
+                    deletedTasks.push(task.text);
+                    tasks.splice(index, 1);
+                    renderTasks(filter, search);
+                };
+
+                div.appendChild(doneBtn);
+                div.appendChild(deleteBtn);
+
+                output.appendChild(div);
+            });
+    }
+
+    function toggleComplete(index) {
+        tasks[index].completed = !tasks[index].completed;
+        renderTasks();
+    }
+
+    function deleteTask() {
+        let deletedList = document.getElementById("deletedList");
+        deletedList.innerHTML = "";
+
+        deletedTasks.forEach(task => {
+            let div = document.createElement("div");
+            div.textContent = `❌ ${task}`;
+            deletedList.appendChild(div);
+        });
+    }
+
+    function filterTasks(type) {
+        renderTasks(type, document.getElementById("searchInput").value);
+    }
+
+    function searchTasks() {
+        let searchTerm = document.getElementById("searchInput").value;
+        renderTasks("all", searchTerm);
+    }
+    function Back() {
+    location.href = `file:///C:/Users/Eva%20Clarke/Desktop/New%20folder/practice/practice%20day3%20part2/dashboard.html`;
+  }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Dictionary App 📖</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      color: #2c3e50;
+    }
+
+    input {
+      padding: 12px;
+      width: 300px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    #meaning {
+      background-color: white;
+      padding: 20px;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 30px;
+      color: #2c3e50;
+    }
+
+    #favoritesList {
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 0;
+      width: 300px;
+      list-style: none;
+    }
+
+    #favoritesList li {
+      background-color: #fff;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #backBtn {
+      margin-top: 30px;
+      background-color: #e74c3c;
+    }
+
+    #backBtn:hover {
+      background-color: #c0392b;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Smart Dictionary App 📖</h1>
+
+  <input type="text" id="word" placeholder="Enter A Word..." />
+  <button onclick="Defination()">Search</button>
+
+  <div id="meaning"></div>
+
+  <h2>⭐ Favorite Words</h2>
+  <ul id="favoritesList"></ul>
+
+  <button id="backBtn" onclick="Back()">🔙 Back</button>
+
+  <script>
+    document.getElementById("word").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        Defination();
+      }
+    });
+
+    async function Defination() {
+      let word = document.getElementById("word").value.trim();
+      let output = document.getElementById("meaning");
+
+      if (word === "") {
+        alert("Please enter a word!");
+        return;
+      }
+
+      const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+
+      try {
+        let x = await fetch(url);
+        let data = await x.json();
+
+        if (data.title === "No Definitions Found") {
+          output.innerHTML = `<p>No definition found for "${word}".</p>`;
+          return;
+        }
+
+        let def = data[0];
+        let meaning = def.meanings[0];
+        let definition = meaning.definitions[0].definition;
+        let example = meaning.definitions[0].example || "No example found.";
+        let audio = def.phonetics[0]?.audio || "";
+
+        output.innerHTML = `
+          <h2>${def.word}</h2>
+          <p><strong>Part of Speech:</strong> ${meaning.partOfSpeech}</p>
+          <p><strong>Definition:</strong> ${definition}</p>
+          <p><strong>Example:</strong> ${example}</p>
+          ${audio ? `<button onclick="playAudio('${audio}')">🔊 Play Pronunciation</button>` : ""}
+          <br><br>
+          <button onclick="addToFavorites('${def.word}')">❤️ Add to Favorites</button>
+        `;
+      } catch (error) {
+        output.innerHTML = `<p>Error fetching word data.</p>`;
+        console.error(error);
+      }
+
+      document.getElementById("word").value = "";
+      document.getElementById("word").focus();
+    }
+
+    function playAudio(audioUrl) {
+      let audio = new Audio(audioUrl);
+      audio.play();
+    }
+
+    function addToFavorites(word) {
+      let favorites = JSON.parse(localStorage.getItem("dictionaryFavorites")) || [];
+      if (!favorites.includes(word)) {
+        favorites.push(word);
+        localStorage.setItem("dictionaryFavorites", JSON.stringify(favorites));
+        renderFavorites();
+      } else {
+        alert("Word already in favorites!");
+      }
+    }
+
+    function renderFavorites() {
+      let list = document.getElementById("favoritesList");
+      let favorites = JSON.parse(localStorage.getItem("dictionaryFavorites")) || [];
+      list.innerHTML = "";
+
+      favorites.forEach((word, index) => {
+        const li = document.createElement("li");
+        li.textContent = word;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "❌";
+        removeBtn.onclick = () => {
+          favorites.splice(index, 1);
+          localStorage.setItem("dictionaryFavorites", JSON.stringify(favorites));
+          renderFavorites();
+        };
+
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    }
+
+    function Back() {
+      location.href = `file:///C:/Users/Eva%20Clarke/Desktop/New%20folder/practice/practice%20day3%20part2/dashboard.html`;
+    }
+
+    renderFavorites();
+  </script>
+</body>
+</html>

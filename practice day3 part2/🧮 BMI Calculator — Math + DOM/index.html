@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🧮 BMI Calculator</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f3f3f3;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #output {
+      font-size: 18px;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 10px;
+      min-height: 30px;
+      background-color: white;
+      width: 300px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧮 BMI Calculator (Age 15–30)</h1>
+
+  <input type="number" id="age" placeholder="Enter your age (15–30)">
+  <input type="number" id="Input" placeholder="Height in cm">
+  <input type="number" id="weight" placeholder="Weight in kg">
+  <button onclick="BMI()">Check BMI</button>
+
+  <div id="output"></div>
+<button onclick="Back()" id="back">Back</button>
+  <script>
+    function BMI() {
+      const age = parseInt(document.getElementById("age").value);
+      const height = parseFloat(document.getElementById("Input").value);
+      const weight = parseFloat(document.getElementById("weight").value);
+      const output = document.getElementById("output");
+
+      if (!age || !height || !weight || age < 15 || age > 30) {
+        output.textContent = "❌ Please enter valid age (15–30), height, and weight.";
+        output.style.color = "red";
+        return;
+      }
+
+      const heightMeters = height / 100;
+      const bmi = weight / (heightMeters * heightMeters);
+      const bmiFixed = bmi.toFixed(2);
+
+      let category = "";
+
+      if (bmi < 18.5) category = "Underweight ❌";
+      else if (bmi < 25) category = "Normal ✅";
+      else if (bmi < 30) category = "Overweight ⚠️";
+      else category = "Obese ❗";
+
+      output.innerHTML = `📊 Your BMI is <b>${bmiFixed}</b><br>Status: <b>${category}</b>`;
+      output.style.color = "black";
+    }
+  function Back() {
+    location.href = `file:///C:/Users/Eva%20Clarke/Desktop/New%20folder/practice/practice%20day3%20part2/dashboard.html`;
+  }
+  </script>
+</body>
+</html>
